@@ -1,25 +1,340 @@
 <head>
-  <title>dexplorer</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Ethereum Block Explorer</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 </head>
 
 <body>
-  <h1>Welcome to Meteor!</h1>
-
-  {{> hello}}
-  {{> info}}
 </body>
-
-<template name="hello">
-  <button>Click Me</button>
-  <p>You've pressed the button {{counter}} times.</p>
+<template name="home">
+  {{>search}}
+  <div class="row">
+    {{> Template.dynamic template=content}}
+  </div>
+  <div class="footer" style="bottom: 0px;text-align: center;background-color: white; width:100%;">
+    <hr>
+    <p>
+      © Copyright SotoLAB Since 2015. All rights reserved. |
+      <a href="https://sotolab.kr" target="_balnk">SotoLAB Web</a>
+    </p>
+  </div>
 </template>
+<template name="mainInfo">
+  <div class="container" style="padding-top: 50px;">
 
-<template name="info">
-  <h2>Learn Meteor!</h2>
-  <ul>
-    <li><a href="https://www.meteor.com/try" target="_blank">Do the Tutorial</a></li>
-    <li><a href="http://guide.meteor.com" target="_blank">Follow the Guide</a></li>
-    <li><a href="https://docs.meteor.com" target="_blank">Read the Docs</a></li>
-    <li><a href="https://forums.meteor.com" target="_blank">Discussions</a></li>
-  </ul>
+    <h1 style="text-align:center;">Welcome to the Etherparty Block Explorer!</h1>
+
+    <h4 style="text-align:center; margin-top: 30px;">
+      <a href="/block/{{blockNum}}">Latest Block: {{blockNum}}</a>
+    </h4>
+
+    <table class="table table-striped" cellpadding="0" cellspacing="0" style="padding:0px;float:left;margin:0px;width:100%">
+      <tbody>
+        <tr>
+          <th>Block #</th>
+          <th>Tx #</th>
+          <th>Size</th>
+          <th>Timestamp</th>
+        </tr>
+        {{#each blockLists}}
+        <tr>
+          <td>
+            <a href="/block/{{number}}">{{number}}</a>
+          </td>
+          <td>{{transactions.length}}</td>
+          <td>{{size}}</td>
+          <td>{{timestamp}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+</template>
+<template name="blockInfos">
+  <div class="container" style="padding-top: 50px;">
+
+    <h1>Block
+      <small>View information about an Ethereum Block </small>
+    </h1>
+    {{#if getBlockHash}}
+
+    <div id="block-97785883" class="blockdiv">
+      <table class="table table-striped" cellpadding="0" cellspacing="0" style="padding:0px;float:left;margin:0px;width:100%">
+        <tbody>
+          <tr>
+            <th colspan="3" align="left">
+              <a class="hash-link" href="/block/{{getBlockHash.blockNumber}}">{{getBlockHash.hash}}</a>
+              <span class="pull-right"></span>
+            </th>
+          </tr>
+        </tbody>
+      </table>
+      <div style="padding-bottom:30px;width:100%;text-align:right;clear:both">
+        <button class="btn btn-primary">{{getBlockHash.conf}}</button>
+        <button class="btn btn-success cb">
+          <span>{{getBlockHash.gasUsed}} Gas Used</span>
+        </button>
+      </div>
+      <table class="table table-striped">
+        <tbody>
+          <tr>
+            <th colspan="2" style="text-align:left">Summary</th>
+          </tr>
+          <tr>
+            <td>Block Number</td>
+            <td>
+              <a href="/block/{{getBlockHash.blockNumber}}">{{getBlockHash.number}}</a>
+            </td>
+          </tr>
+          <tr>
+            <td>Received Time</td>
+            <td>
+              {{getBlockHash.timestamp}}
+            </td>
+          </tr>
+          <tr>
+            <td>Difficulty</td>
+            <td>
+              {{getBlockHash.difficulty}}
+            </td>
+          </tr>
+          <tr>
+            <td>Nonce</td>
+            <td>{{getBlockHash.nonce}}</td>
+          </tr>
+          <tr>
+            <td>Size</td>
+            <td>{{getBlockHash.size}}</td>
+          </tr>
+          <tr>
+            <td>Miner</td>
+            <td>
+              <a href="/address/{{getBlockHash.miner}}">{{getBlockHash.miner}}</a>
+            </td>
+          </tr>
+          <tr>
+            <td>Gas Limit</td>
+            <td>{{getBlockHash.gasLimit}}</td>
+          </tr>
+          <tr>
+            <td>Data</td>
+            <td>{{getBlockHash.extraData}}</td>
+          </tr>
+
+          <tr>
+            <td>Data (Translated)</td>
+            <td>{{getBlockHash.dataFromHex}}</td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+    {{/if}}
+    {{#if transactions}}
+    <h2 style="margin-top: 30px;">
+      Transactions
+      <small>- contained in current block</small>
+    </h2>
+    {{#each transactions}}
+    <div>
+
+      <!-- <div ng-repeat="tx in transactions"> -->
+      <table class="table table-striped">
+        <tbody>
+          <tr>
+            <!-- <th colspan="2" style="text-align:left">Transaction #{{$index+1}}</th> -->
+          </tr>
+          <tr>
+            <td>Hash #</td>
+            <td>
+              <a href="/transaction/{{hash}}">{{hash}}</a>
+            </td>
+          </tr>
+          <tr>
+            <td>From</td>
+            <td>
+              <a href="/address/{{from}}">{{from}}</a>
+            </td>
+          </tr>
+          <tr>
+            <td>To</td>
+            <td>
+              <a href="/address/{{to}}">{{to}}</a>
+            </td>
+          </tr>
+          <tr>
+            <td>Gas</td>
+            <td>{{gas}}</td>
+          </tr>
+          <tr>
+            <td>Input</td>
+            <td>{{input}}</td>
+          </tr>
+          <tr>
+            <td>Value</td>
+            <td>{{value}}</td>
+          </tr>
+        </tbody>
+      </table>
+      <hr>
+    </div>
+    {{/each}}
+    {{/if}}
+  </div>
+</template>
+<template name="addressInfo">
+  <div class="container" style="padding-top: 50px;">
+    <h1>Address
+      <small>View information about an Ethereum Address</small>
+    </h1>
+
+    <div id="address-97785883" class="addressdiv">
+      <table class="table table-striped" cellpadding="0" cellspacing="0" style="padding:0px;float:left;margin:0px;width:100%">
+        <tbody>
+          <tr>
+            <th colspan="3" align="left">{{addressId}}
+              <span class="pull-right"></span>
+            </th>
+          </tr>
+        </tbody>
+      </table>
+      <table class="table table-striped">
+        <tbody>
+          <tr>
+            <td>Balance (Wei)</td>
+            <td>{{balance}}</td>
+          </tr>
+          <tr>
+            <td>Balance (Ether)</td>
+            <td>{{balanceInEther}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</template>
+<template name="transactionInfos">
+  <div class="container" style="padding-top: 50px;">
+
+    <h1>Transaction
+      <small>View information about an Ethereum transaction</small>
+    </h1>
+
+    {{#if getTransaction}}
+
+    <div id="tx-97785883" class="txdiv">
+      <table class="table table-striped" cellpadding="0" cellspacing="0" style="padding:0px;float:left;margin:0px;width:100%">
+        <tbody>
+          <tr>
+            <th colspan="3" align="left">
+              <a class="hash-link" href="/transaction/{{txId}}">{{txId}}</a>
+              <span class="pull-right"></span>
+            </th>
+          </tr>
+          <tr>
+            <td width="500px" class="">
+              <a href="/address/{{getTransaction.from}}">{{getTransaction.from}}</a>
+              <br>
+            </td>
+            <td width="48px" class="" style="padding:4px;text-align:center;vertical-align:middle;">
+              <img src="https://blockchain.info/Resources/arrow_right_green.png">
+              <!--TODO upload the image on the server-->
+            </td>
+            <td class="">
+              <a href="/address/{{getTransaction.to}}">{{getTransaction.to}}</a>
+              <span class="pull-right">
+                <span>{{getTransaction.ethValue}} ETH</span>
+              </span>
+              <br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="padding-bottom:30px;width:100%;text-align:right;clear:both">
+        <!--TODO no style tags...-->
+        <button class="btn btn-primary">{{getTransaction.conf}} Confirmations</button>
+        <button class="btn btn-success cb">
+          <span>{{getTransaction.ethValue}} ETH</span>
+        </button>
+      </div>
+      <table class="table table-striped">
+        <tbody>
+          <tr>
+            <th colspan="2" style="text-align:left">Summary</th>
+          </tr>
+          <tr>
+            <td>Block Hash</td>
+            <td>
+              <a href="/block/{{getTransaction.blockNumber}}">{{getTransaction.blockHash}}</a>
+            </td>
+          </tr>
+          <tr>
+            <td>Received Time</td>
+            <td>
+              {{getTransaction.time}}
+            </td>
+          </tr>
+          <tr>
+            <td>Included In Block</td>
+            <td>
+              <a href="/block/{{getTransaction.blockNumber}}">{{getTransaction.blockNumber}}</a>
+            </td>
+          </tr>
+          <tr>
+            <td>Gas Used</td>
+            <td>{{getTransaction.gas}}</td>
+          </tr>
+          <tr>
+            <td>Gas Price</td>
+            <td>{{getTransaction.gasPrice}}</td>
+          </tr>
+          <tr>
+            <td>Number of transactions made by the sender prior to this one</td>
+            <td>{{getTransaction.nonce}}</td>
+          </tr>
+          <tr>
+            <td>Transaction price</td>
+            <td>{{getTransaction.txprice}}</td>
+          </tr>
+          <tr>
+            <td>Data</td>
+            <td>{{getTransaction.input}}</td>
+          </tr>
+
+
+        </tbody>
+      </table>
+    </div>
+    <!-- {{else}}
+      <small>Loading...</small> -->
+
+    {{/if}}
+  </div>
+
+</template>
+<template name="search">
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <span class="icon-bar"></span>
+        <a href="/" class="navbar-brand">Ether Block Explorer</a>
+      </div>
+      <div id="navbar" class="navbar-collapse collapse">
+        <ul class="nav navbar-nav">
+          <form name="search_form" ng-controller="mainCtrl" ng-submit="processRequest()" class="navbar-form navbar-right">
+            <div class="form-group">
+              <input type="text" placeholder="Tx Hash, Address or Block number" name="requestType" required ng-model="ethRequest"
+                class="form-control">
+              <br>
+            </div>
+            <button type="submit" class="btn btn-success">Search</button>
+          </form>
+        </ul>
+      </div>
+    </div>
+  </nav>
 </template>
